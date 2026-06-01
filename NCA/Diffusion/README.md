@@ -158,23 +158,17 @@ This is the standard generation workflow and writes generated MAT files and anal
 
 Use this workflow when preparing GAF inputs for SOH estimation.
 
-`windowed_dataset.py` first removes empty windows and missing condition vectors, then selects windows using NCA rules:
+For NCA, the test `*_test_sliding.mat` files are already fixed-fragment inputs prepared by `Data_process`. Each test cycle contains the selected window for the chosen mode, so Diffusion does not need to choose low, middle, high, or random again from multiple candidate windows.
+
+`windowed_dataset.py` still removes empty windows and missing condition vectors. The split behavior is:
 
 ```text
 train: low + middle + high windows per cycle
 val  : one selected window, default random
-test : one selected window, choose low / middle / high / random
+test : one fixed-fragment window already stored in the test sliding MAT file
 ```
 
-For NCA, if a cycle has `n_valid_windows` valid windows:
-
-```text
-low    = min(3, n_valid_windows - 1)
-high   = max(n_valid_windows - 3, 0)
-middle = (low + high) // 2
-```
-
-If a cycle has too few valid windows, these positions naturally fall back to an available window.
+The test mode name (`low`, `middle`, `high`, or `random`) should match the `Data_process/data_for_generated/<mode>/` files that you copied into `Diffusion/data_for_generated/`.
 
 #### Train Generation
 
@@ -220,7 +214,9 @@ INFO     [N, 2]
 
 #### Test Generation
 
-Test generation reads from `./data_for_generated`. Generate four selected-window variants, each with 5 generated images per cycle:
+Test generation reads from `./data_for_generated`. Before running a command, copy the matching fixed-fragment test files from `NCA/Data_process/data_for_generated/<mode>/` into `NCA/Diffusion/data_for_generated/`.
+
+Each command generates 5 GAF images per cycle from the one fixed-fragment window already stored in the input MAT file:
 
 ```bash
 python windowed_reverse_diffusion.py --config configs/windowed_reverse_diffusion.json --data_dir ./data_for_generated --split test --test_window_mode low --num_samples 5 --output_dir generated_gaf/test_low
