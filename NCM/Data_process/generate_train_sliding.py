@@ -278,9 +278,11 @@ def process_battery(config: DatasetConfig, battery_id: int, battery_full: list, 
 
 
 def main() -> None:
-    # Write each dataset output in place and copy train MAT files into data/.
-    output_dir = ROOT / "data"
-    output_dir.mkdir(exist_ok=True)
+    # Write each dataset output in place and mirror Diffusion input folders.
+    data_dir = ROOT / "data"
+    data_for_generated_dir = ROOT / "data_for_generated"
+    data_dir.mkdir(exist_ok=True)
+    data_for_generated_dir.mkdir(exist_ok=True)
     for config in DATASETS:
         dataset_dir = ROOT / config.name
         battery_full, battery_fix = load_batteries(dataset_dir)
@@ -291,10 +293,12 @@ def main() -> None:
             filename = f"{config.prefix}battery{battery_id}_02_{split_name}_sliding.mat"
             output_path = dataset_dir / filename
             savemat(output_path, output, do_compression=False)
-            if split_name == "train":
-                shutil.copy2(output_path, output_dir / filename)
+            if split_name in {"train", "val"}:
+                shutil.copy2(output_path, data_dir / filename)
+            elif split_name == "test":
+                shutil.copy2(output_path, data_for_generated_dir / filename)
             print(f"Saved -> {output_path.relative_to(ROOT)}")
-    print("Done. Training sliding MAT files were copied to data/.")
+    print("Done. Train/val MAT files were copied to data/ and test MAT files to data_for_generated/.")
 
 
 if __name__ == "__main__":
