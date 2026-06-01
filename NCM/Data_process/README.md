@@ -29,17 +29,19 @@ NCM_1C/*_sliding.mat
 NCM_2C/*_sliding.mat
 NCM_3C/*_sliding.mat
 data/*_train_sliding.mat
+data/*_val_sliding.mat
+data_for_generated/*_test_sliding.mat
 ```
 
-`NCM_1C/`, `NCM_2C/`, and `NCM_3C/` are the original dataset folders. The script reads the original MAT files from these folders and writes generated `*_sliding.mat` files back beside the original data. It also copies generated train files into `Data_process/data/`.
+`NCM_1C/`, `NCM_2C/`, and `NCM_3C/` are the original dataset folders. The script reads the original MAT files from these folders and writes generated `*_sliding.mat` files back beside the original data. Put generated train and validation files in `Data_process/data/`, and generated test files in `Data_process/data_for_generated/`.
 
-The copied train files in `Data_process/data/` are the files to place in:
+The files in `Data_process/data/` are the files to place in:
 
 ```text
 NCM/Diffusion/data/
 ```
 
-Use these files for diffusion training and train selected-window generation.
+Use these files for diffusion training, validation, and train/validation selected-window generation.
 
 If you also need validation and test files for Diffusion, copy the generated validation/test `*_sliding.mat` files from the original dataset folders into the staging folders below:
 
