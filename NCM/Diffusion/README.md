@@ -40,7 +40,6 @@ window workflow       : low / middle / high / random
 |-- checkpoints/                       # Checkpoints and condition-vector statistics
 |-- generated_data/                    # Standard reverse diffusion output
 |-- generated_gaf/                     # Selected-window reverse diffusion output
-|-- real/                              # Real sliding MAT files for SOH input building
 |-- matlab/                            # Capacity/SOH source MAT files
 |-- soh_input/                         # SOH-ready MAT output
 |-- output/                            # Training/testing figures and metrics
@@ -62,7 +61,7 @@ Install PyTorch manually if your environment requires a specific CUDA build.
 
 ### `data/`
 
-Put train/validation/test sliding MAT files here. This folder is used for diffusion training/testing and for selected-window train/validation generation.
+Put train/validation/test sliding MAT files here. This folder is used for diffusion training/testing, selected-window train/validation generation, and SOH input construction.
 
 Expected file names follow this pattern:
 
@@ -100,10 +99,6 @@ cond_std.npy
 ```
 
 `cond_mean.npy` and `cond_std.npy` are required by reverse generation.
-
-### `real/`
-
-Put real sliding MAT files here for SOH input construction. Train SOH input needs these files to write `GAF_real`.
 
 ### `matlab/`
 
@@ -213,7 +208,7 @@ GAF_gen  [N, 60, H, W]
 Validation generation also reads from `./data`. Each cycle uses one random valid window and generates 20 images:
 
 ```bash
-python windowed_reverse_diffusion.py   --config configs/windowed_reverse_diffusion.json   --data_dir ./data   --split val   --val_window_mode random   --num_samples 20   --output_dir generated_gaf/val_random
+python windowed_reverse_diffusion.py   --config configs/windowed_reverse_diffusion.json   --data_dir ./data   --split val   --val_window_mode random   --num_samples 20   --output_dir generated_gaf/val
 ```
 
 Output:
@@ -243,15 +238,26 @@ INFO     [N, 2]
 
 ### 5. Build SOH Input MAT Files
 
-Convert generated GAF folders into SOH-ready MAT files by pointing `generated_dir` to the folder you want to process:
+After each selected-window generation command finishes, run the SOH builder for the corresponding generated folder. `real_dir` points to `./data`, so the real sliding MAT files are reused from `data/` and do not need to be copied into `real/`.
 
 ```bash
-python soh_input_builder.py --config configs/soh_input_builder.json --generated_dir generated_gaf/train --output_dir soh_input/train
-python soh_input_builder.py --config configs/soh_input_builder.json --generated_dir generated_gaf/val_random --output_dir soh_input/val_random
-python soh_input_builder.py --config configs/soh_input_builder.json --generated_dir generated_gaf/test_low --output_dir soh_input/test_low
-python soh_input_builder.py --config configs/soh_input_builder.json --generated_dir generated_gaf/test_middle --output_dir soh_input/test_middle
-python soh_input_builder.py --config configs/soh_input_builder.json --generated_dir generated_gaf/test_high --output_dir soh_input/test_high
-python soh_input_builder.py --config configs/soh_input_builder.json --generated_dir generated_gaf/test_random --output_dir soh_input/test_random
+python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data --generated_dir generated_gaf/train --output_dir soh_input/train
+python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data --generated_dir generated_gaf/val --output_dir soh_input/val
+python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data_for_generated --generated_dir generated_gaf/test_low --output_dir soh_input/test_low
+python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data_for_generated --generated_dir generated_gaf/test_middle --output_dir soh_input/test_middle
+python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data_for_generated --generated_dir generated_gaf/test_high --output_dir soh_input/test_high
+python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data_for_generated --generated_dir generated_gaf/test_random --output_dir soh_input/test_random
+```
+
+Folder mapping:
+
+```text
+generated_gaf/train       -> soh_input/train
+generated_gaf/val         -> soh_input/val
+generated_gaf/test_low    -> soh_input/test_low
+generated_gaf/test_middle -> soh_input/test_middle
+generated_gaf/test_high   -> soh_input/test_high
+generated_gaf/test_random -> soh_input/test_random
 ```
 
 SOH input fields:
@@ -292,12 +298,13 @@ window_seed
 `configs/soh_input_builder.json` controls SOH input construction:
 
 ```text
-real_dir
-generated_dir
-output_dir
+data_dir
 matlab_sources
 expected_train_windows
 compare_splits
+real_dir
+generated_dir
+output_dir
 ```
 
 ## Recommended Run Order
@@ -306,9 +313,15 @@ compare_splits
 python cs_main.py --config configs/cs_main_train.json
 python cs_main.py --config configs/cs_main_test.json
 python windowed_reverse_diffusion.py --config configs/windowed_reverse_diffusion.json --data_dir ./data --split train --num_samples 20 --output_dir generated_gaf/train
-python windowed_reverse_diffusion.py --config configs/windowed_reverse_diffusion.json --data_dir ./data --split val --val_window_mode random --num_samples 20 --output_dir generated_gaf/val_random
+python windowed_reverse_diffusion.py --config configs/windowed_reverse_diffusion.json --data_dir ./data --split val --val_window_mode random --num_samples 20 --output_dir generated_gaf/val
 python windowed_reverse_diffusion.py --config configs/windowed_reverse_diffusion.json --data_dir ./data_for_generated --split test --test_window_mode low --num_samples 5 --output_dir generated_gaf/test_low
 python windowed_reverse_diffusion.py --config configs/windowed_reverse_diffusion.json --data_dir ./data_for_generated --split test --test_window_mode middle --num_samples 5 --output_dir generated_gaf/test_middle
 python windowed_reverse_diffusion.py --config configs/windowed_reverse_diffusion.json --data_dir ./data_for_generated --split test --test_window_mode high --num_samples 5 --output_dir generated_gaf/test_high
 python windowed_reverse_diffusion.py --config configs/windowed_reverse_diffusion.json --data_dir ./data_for_generated --split test --test_window_mode random --num_samples 5 --output_dir generated_gaf/test_random
+python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data --generated_dir generated_gaf/train --output_dir soh_input/train
+python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data --generated_dir generated_gaf/val --output_dir soh_input/val
+python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data_for_generated --generated_dir generated_gaf/test_low --output_dir soh_input/test_low
+python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data_for_generated --generated_dir generated_gaf/test_middle --output_dir soh_input/test_middle
+python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data_for_generated --generated_dir generated_gaf/test_high --output_dir soh_input/test_high
+python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data_for_generated --generated_dir generated_gaf/test_random --output_dir soh_input/test_random
 ```

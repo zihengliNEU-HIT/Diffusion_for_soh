@@ -1,5 +1,5 @@
 {
-  "real_dir": "./real",
+  "real_dir": "./data",
   "generated_dir": "./generated_gaf/train",
   "output_dir": "./soh_input/train",
   "matlab_sources": {
