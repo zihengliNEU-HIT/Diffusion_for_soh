@@ -10,9 +10,9 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 import numpy as np
 from scipy.io import loadmat, savemat
 
-REAL_DIR = "./real"
-GENERATED_DIR = "./low_4"
-OUTPUT_DIR = "./SOH_input_low"
+REAL_DIR = "./data_for_generated"
+GENERATED_DIR = "./generated_gaf/test_random"
+OUTPUT_DIR = "./soh_input/test_random"
 MATLAB_SOURCES = {
     "1C": "./matlab/matlab1C.mat",
     "2C": "./matlab/matlab2C.mat",

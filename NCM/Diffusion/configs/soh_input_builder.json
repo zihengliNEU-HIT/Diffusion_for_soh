@@ -1,7 +1,7 @@
 {
-  "real_dir": "./data",
-  "generated_dir": "./generated_gaf/train",
-  "output_dir": "./soh_input/train",
+  "real_dir": "./data_for_generated",
+  "generated_dir": "./generated_gaf/test_random",
+  "output_dir": "./soh_input/test_random",
   "matlab_sources": {
     "1C": "./matlab/matlab1C.mat",
     "2C": "./matlab/matlab2C.mat",

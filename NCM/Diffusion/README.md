@@ -238,7 +238,7 @@ INFO     [N, 2]
 
 ### 5. Build SOH Input MAT Files
 
-After each selected-window generation command finishes, run the SOH builder for the corresponding generated folder. `real_dir` points to `./data`, so the real sliding MAT files are reused from `data/` and do not need to be copied into `real/`.
+After each selected-window generation command finishes, run the SOH builder for the corresponding generated folder. `real_dir` points to the sliding MAT folder that matches the selected split and window mode.
 
 ```bash
 python soh_input_builder.py --config configs/soh_input_builder.json --real_dir ./data --generated_dir generated_gaf/train --output_dir soh_input/train
