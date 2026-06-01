@@ -1,0 +1,18 @@
+{
+  "data_dir": "./data_for_generated",
+  "output_dir": "./generated_data",
+  "checkpoint_dir": "./checkpoints",
+  "checkpoint_path": "./checkpoints/model_epoch_175.pt",
+  "batch_size": 32,
+  "device": "cuda",
+  "num_workers": 4,
+  "timesteps": 300,
+  "noise_schedule": "cosine",
+  "num_samples": 16,
+  "use_ddim": true,
+  "ddim_steps": 20,
+  "ddim_eta": 1.0,
+  "cosine_s": 0.008,
+  "ema": 0.99995,
+  "cond_vector_dim": 22
+}

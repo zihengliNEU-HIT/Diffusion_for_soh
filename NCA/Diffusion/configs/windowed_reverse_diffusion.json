@@ -1,0 +1,22 @@
+{
+  "data_dir": "./data_for_generated",
+  "output_dir": "./generated_gaf",
+  "checkpoint_path": "./checkpoints/model_epoch_175.pt",
+  "checkpoint_dir": "./checkpoints",
+  "batch_size": 32,
+  "device": "cuda",
+  "num_workers": 4,
+  "timesteps": 300,
+  "noise_schedule": "cosine",
+  "num_samples": 20,
+  "use_ddim": true,
+  "ddim_steps": 30,
+  "ddim_eta": 1.0,
+  "cosine_s": 0.008,
+  "ema": 0.99995,
+  "split": "test",
+  "val_window_mode": "random",
+  "test_window_mode": "high",
+  "window_seed": 42,
+  "cond_vector_dim": 22
+}
