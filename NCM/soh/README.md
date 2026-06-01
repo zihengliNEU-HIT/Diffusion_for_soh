@@ -1,8 +1,6 @@
 # NCM SOH Estimator
 
-Image-only state-of-health (SOH) estimation for NCM battery capacity
-prediction. The model uses Gramian Angular Field (GAF) images as input, a
-configurable CNN encoder, and a lightweight self-attention regressor.
+Image-only state-of-health (SOH) estimation for NCM battery capacity prediction. The model uses SOH-ready GAF MAT files produced by the Diffusion workflow.
 
 ## Project Structure
 
@@ -14,86 +12,107 @@ configurable CNN encoder, and a lightweight self-attention regressor.
 - `SOH_utils.py` - checkpoints, metrics, denormalization, and plotting helpers.
 - `save_npy.py` - per-test-file inference that saves structured `.npy` outputs.
 
-## Data Format
+## Input From Diffusion
 
-The code expects split-specific MAT files in `data_dir`:
+Keep the same `soh_input` layout as `NCM/Diffusion`:
 
-- Train files: `*_train_soh.mat`
-- Validation files: `*_val_soh.mat`
-- Test files: `*_test_soh.mat`
+```text
+NCM/Diffusion/soh_input/train       -> NCM/soh/soh_input/train
+NCM/Diffusion/soh_input/val         -> NCM/soh/soh_input/val
+NCM/Diffusion/soh_input/test_low    -> NCM/soh/soh_input/test_low
+NCM/Diffusion/soh_input/test_middle -> NCM/soh/soh_input/test_middle
+NCM/Diffusion/soh_input/test_high   -> NCM/soh/soh_input/test_high
+NCM/Diffusion/soh_input/test_random -> NCM/soh/soh_input/test_random
+```
+
+Expected files:
+
+```text
+*_train_soh.mat
+*_val_soh.mat
+*_test_soh.mat
+```
 
 Expected fields:
 
-- `GAF_real`: `[N, H, W]`, used by training files.
-- `GAF_gen`: `[N, K, H, W]`, generated GAF images.
-- `CAPACITY`: `[N, 1]`, capacity values in Ah.
-- `INFO`: `[N, 2]`, battery id and cycle index.
-
-`CAPACITY` is min-max normalized using the training split. The scaler is saved
-to `soh_min.npy` and `soh_max.npy` under `checkpoint_dir`.
-
-## Quick Start
-
-Install the Python dependencies used by the scripts:
-
-```bash
-pip install numpy scipy matplotlib torch
+```text
+GAF_real    # train files only
+GAF_gen
+CAPACITY
+INFO
 ```
 
-Train the model. Use `./soh_data` as the training data directory. Checkpoints
-are saved to `checkpoint_dir`, and the training loss curve is saved to
-`output_dir`.
+## Train
 
-```bash
-python SOH_train.py --data_dir ./soh_data --output_dir ./train_output --checkpoint_dir ./soh_checkpoints
+The current SOH loader expects train, validation, and test MAT files to be in the same `data_dir`. Prepare a training folder by copying:
+
+```text
+NCM/soh/soh_input/train/*_train_soh.mat
+NCM/soh/soh_input/val/*_val_soh.mat
+NCM/soh/soh_input/test_random/*_test_soh.mat
 ```
 
-For test-time export, `save_npy.py` is recommended instead of `SOH_test.py`
-because it saves one structured `.npy` file and plots for each test MAT file.
-Before running it, edit `SOH_config.py` and set the test input/output pair you
-want:
+into:
+
+```text
+NCM/soh/soh_input/train_run/
+```
+
+```bash
+python SOH_train.py --data_dir ./soh_input/train_run --output_dir ./train_output --checkpoint_dir ./soh_checkpoints
+```
+
+Training writes:
+
+```text
+train_output/loss_curve.png
+soh_checkpoints/best_model.pt
+soh_checkpoints/model_epoch_*.pt
+soh_checkpoints/soh_min.npy
+soh_checkpoints/soh_max.npy
+```
+
+## Export Test Results
+
+Input directories keep the Diffusion names. Output directories add `_output` so generated results do not mix with input MAT files.
+
+Default config:
 
 ```python
-data_dir = "./random"
-output_dir = "./test_random"
+data_dir = "./soh_input/test_random"
+output_dir = "./test_random_output"
 checkpoint_dir = "./soh_checkpoints"
 ```
 
-Other common test sets use the same pattern:
-
-```python
-data_dir = "./middle"
-output_dir = "./test_middle"
-
-data_dir = "./low"
-output_dir = "./test_low"
-
-data_dir = "./high"
-output_dir = "./test_high"
-```
-
-Then run:
+Run default random test export:
 
 ```bash
 python save_npy.py
 ```
 
-`SOH_test.py` is still available for metrics, `predictions.npy`, and attention
-map visualization:
+Run each test mode:
 
 ```bash
-python SOH_test.py --data_dir ./random --output_dir ./test_random --checkpoint_dir ./soh_checkpoints
+python save_npy.py --data_dir ./soh_input/test_low --output_dir ./test_low_output
+python save_npy.py --data_dir ./soh_input/test_middle --output_dir ./test_middle_output
+python save_npy.py --data_dir ./soh_input/test_high --output_dir ./test_high_output
+python save_npy.py --data_dir ./soh_input/test_random --output_dir ./test_random_output
 ```
 
-## Outputs
+`SOH_test.py` is also available for aggregate metrics and attention maps:
 
-Training saves checkpoints and `loss_curve.png`. Testing saves:
+```bash
+python SOH_test.py --data_dir ./soh_input/test_random --output_dir ./test_random_output --checkpoint_dir ./soh_checkpoints
+```
 
-- `metrics.txt`
-- `regression_plot.png`
-- `trajectory_battery*.png`
-- `predictions.npy`
-- `attn_maps/` when attention visualization is enabled
+Test outputs include:
 
-`save_npy.py` saves per-battery structured arrays with `gt`, `pred`, `bat_idx`,
-and `cycle_idx` fields, plus per-battery regression and trajectory plots.
+```text
+metrics.txt
+regression_plot.png
+trajectory_battery*.png
+predictions.npy
+attn_maps/
+```
+
+`save_npy.py` also writes per-battery `.npy`, regression, and trajectory files.
