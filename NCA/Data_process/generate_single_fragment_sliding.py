@@ -29,12 +29,12 @@ class FragmentConfig:
 
 
 DATASETS = (
-    # 1C test split used by code2_22_nocycle.m: test=[6,4].
-    FragmentConfig("Dataset_1_NCA_batteryCY25-1_1", "singel_fragment", "1C", 3, (6, 4)),
-    # 0.25C test split used by code2_22_nocycle.m: test=[6].
-    FragmentConfig("Dataset_1_NCA_batteryCY25-025_1", "singel_fragment", "025C", 1, (6,)),
-    # 0.5C test split used by code2_22_nocycle.m: test=[4,8,16].
-    FragmentConfig("Dataset_1_NCA_batteryCY25-05_1", "Single_frag_process", "05C", 2, (4, 8, 16)),
+    # 1C test split: test=[6,4].
+    FragmentConfig("Dataset_1_NCA_batteryCY25-1_1", "", "1C", 3, (6, 4)),
+    # 0.25C test split: test=[6].
+    FragmentConfig("Dataset_1_NCA_batteryCY25-025_1", "", "025C", 1, (6,)),
+    # 0.5C test split: test=[4,8,16].
+    FragmentConfig("Dataset_1_NCA_batteryCY25-05_1", "", "05C", 2, (4, 8, 16)),
 )
 
 
