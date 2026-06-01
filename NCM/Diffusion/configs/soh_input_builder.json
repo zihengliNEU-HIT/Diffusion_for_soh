@@ -1,0 +1,20 @@
+{
+  "real_dir": "./data",
+  "generated_dir": "./generated_gaf/train",
+  "output_dir": "./soh_input/train",
+  "matlab_sources": {
+    "1C": "./matlab/matlab1C.mat",
+    "2C": "./matlab/matlab2C.mat",
+    "3C": "./matlab/matlab3C.mat"
+  },
+  "strict_require_real_for_train": true,
+  "allow_missing_real_for_train": false,
+  "strict_require_generated": true,
+  "compare_splits": [
+    "train",
+    "test"
+  ],
+  "auto_scale_image_to_01": true,
+  "expected_train_windows": 3,
+  "verbose": true
+}
