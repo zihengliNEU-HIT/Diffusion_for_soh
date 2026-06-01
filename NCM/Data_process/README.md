@@ -31,7 +31,7 @@ NCM_3C/*_sliding.mat
 data/*_train_sliding.mat
 ```
 
-The script writes every generated `*_sliding.mat` file back to its matching `NCM_1C`, `NCM_2C`, or `NCM_3C` folder. It also copies generated train files into `Data_process/data/`.
+`NCM_1C/`, `NCM_2C/`, and `NCM_3C/` are the original dataset folders. The script reads the original MAT files from these folders and writes generated `*_sliding.mat` files back beside the original data. It also copies generated train files into `Data_process/data/`.
 
 The copied train files in `Data_process/data/` are the files to place in:
 
@@ -41,16 +41,18 @@ NCM/Diffusion/data/
 
 Use these files for diffusion training and train selected-window generation.
 
-Validation and test files remain in the matching dataset folders. Copy validation files into:
+If you also need validation and test files for Diffusion, copy the generated validation/test `*_sliding.mat` files from the original dataset folders into the staging folders below:
 
 ```text
-NCM/Diffusion/data/
+Data_process/data/                  # train and val files for Diffusion
+Data_process/data_for_generated/    # test files for Diffusion
 ```
 
-Copy test files into:
+Then copy the staging folders into Diffusion:
 
 ```text
-NCM/Diffusion/data_for_generated/
+NCM/Data_process/data/                 -> NCM/Diffusion/data/
+NCM/Data_process/data_for_generated/   -> NCM/Diffusion/data_for_generated/
 ```
 
 Use these files for low, middle, high, or random selected-window test generation.
@@ -58,9 +60,8 @@ Use these files for low, middle, high, or random selected-window test generation
 ## Folder Mapping
 
 ```text
-NCM/Data_process/data/                         -> NCM/Diffusion/data/
-NCM/Data_process/NCM_*/ *_val_sliding.mat      -> NCM/Diffusion/data/
-NCM/Data_process/NCM_*/ *_test_sliding.mat     -> NCM/Diffusion/data_for_generated/
+NCM/Data_process/data/                 -> NCM/Diffusion/data/
+NCM/Data_process/data_for_generated/   -> NCM/Diffusion/data_for_generated/
 ```
 
 ## Output MAT Fields
