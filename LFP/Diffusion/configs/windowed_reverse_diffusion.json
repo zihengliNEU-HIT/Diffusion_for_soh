@@ -1,0 +1,21 @@
+{
+  "data_dir": "./data",
+  "output_dir": "./generated_gaf/train",
+  "checkpoint_dir": "./checkpoints",
+  "checkpoint_path": "./checkpoints/model_epoch_120.pt",
+  "batch_size": 32,
+  "num_workers": 4,
+  "timesteps": 300,
+  "noise_schedule": "cosine",
+  "num_samples": 20,
+  "use_ddim": true,
+  "ddim_steps": 30,
+  "ddim_eta": 1.0,
+  "cosine_s": 0.008,
+  "ema": 0.99995,
+  "cond_vector_dim": 24,
+  "split": "train",
+  "val_window_mode": "random",
+  "test_window_mode": "middle",
+  "window_seed": 42
+}

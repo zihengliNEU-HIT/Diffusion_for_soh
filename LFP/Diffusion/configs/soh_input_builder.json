@@ -1,0 +1,20 @@
+{
+  "real_dir": "./data_for_generated",
+  "generated_dir": "./generated_gaf/test_random",
+  "output_dir": "./soh_input/test_random",
+  "matlab_sources": {
+    "53C_54": "./matlab/matlab53C_54.mat",
+    "56C_19": "./matlab/matlab56C_19.mat",
+    "56C_36": "./matlab/matlab56C_36.mat"
+  },
+  "strict_require_real_for_train": true,
+  "allow_missing_real_for_train": false,
+  "strict_require_generated": true,
+  "auto_scale_image_to_01": true,
+  "expected_train_windows": 3,
+  "compare_splits": [
+    "train",
+    "test"
+  ],
+  "verbose": true
+}
