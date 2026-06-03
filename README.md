@@ -20,7 +20,7 @@ Please see the README files inside each subfolder for detailed instructions.
 
 ## Data
 
-This GitHub repository includes code and selected test data. The training data are not included in the GitHub repository.
+This repository includes code and selected test data. The training data are not included in the Zenodo package because they are large. If training data are needed, they can be generated with `Data_process` in each subproject, then used for Diffusion and SOH training by following the full workflow.
 
 The same code and data package can be downloaded from Zenodo:
 
